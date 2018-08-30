@@ -1,0 +1,50 @@
+{
+  "name": "vue-create-api",
+  "version": "1.0.0",
+  "description": "A Vue plugin which make Vue component invocated by API.",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node examples/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cube-ui/create-api.git"
+  },
+  "keywords": [
+    "create-api",
+    "cube-ui",
+    "Vue",
+    "component"
+  ],
+  "author": "ustbhuangyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cube-ui/create-api/issues"
+  },
+  "homepage": "https://github.com/cube-ui/create-api#readme",
+  "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-polyfill": "^6.22.0",
+    "babel-preset-env": "^1.5.1",
+    "cross-spawn": "^5.0.1",
+    "css-loader": "^0.28.7",
+    "eslint": "^3.19.0",
+    "eslint-plugin-vue-libs": "^1.2.0",
+    "express": "^4.14.1",
+    "rollup": "^0.50.0",
+    "rollup-plugin-buble": "^0.19.2",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-watch": "^4.3.1",
+    "uglify-js": "^3.1.2",
+    "vue": "^2.5.16",
+    "vue-loader": "^15.2.1",
+    "vue-template-compiler": "^2.5.16",
+    "vuepress": "^0.10.0",
+    "vuepress-theme-vue": "^1.0.3",
+    "webpack": "^4.8.3",
+    "webpack-dev-middleware": "^1.10.0",
+    "webpack-hot-middleware": "^2.19.1"
+  }
+}
