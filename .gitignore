@@ -9,7 +9,6 @@ test/e2e/reports
 selenium-debug.log
 
 # Test publish files
-cube-ui-*.tgz
 package/
 
 # Editor directories and files
