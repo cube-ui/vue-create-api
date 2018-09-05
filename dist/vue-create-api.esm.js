@@ -3,55 +3,68 @@
  * (c) 2018 ustbhuangyi
  * @license MIT
  */
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 var camelizeRE = /-(\w)/g;
 
 function camelize(str) {
   return (str + '').replace(camelizeRE, function (m, c) {
-    return c ? c.toUpperCase() : ''
-  })
+    return c ? c.toUpperCase() : '';
+  });
 }
 
 function escapeReg(str, delimiter) {
-  return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&')
+  return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
 }
 
 function isBoolean(value) {
-  return typeof value === 'boolean'
+  return typeof value === 'boolean';
 }
 
-
-
 function isUndef(value) {
-  return value === undefined
+  return value === undefined;
 }
 
 function isStr(value) {
-  return typeof value === 'string'
+  return typeof value === 'string';
 }
 
 function isFunction(fn) {
-  return typeof fn === 'function'
+  return typeof fn === 'function';
 }
 
 function assert(condition, msg) {
   if (!condition) {
-    throw new Error(("[create-api error]: " + msg))
+    throw new Error("[create-api error]: " + msg);
   }
 }
 
 function instantiateComponent(Vue, Component, data, renderFn, options) {
-  var renderData;
-  var childrenRenderFn;
+  var renderData = void 0;
+  var childrenRenderFn = void 0;
 
-  var instance = new Vue(Object.assign({}, options,
-    {render: function render(createElement) {
+  var instance = new Vue(_extends({}, options, {
+    render: function render(createElement) {
       var children = childrenRenderFn && childrenRenderFn(createElement);
       if (children && !Array.isArray(children)) {
         children = [children];
       }
 
-      return createElement(Component, Object.assign({}, renderData), children || [])
+      return createElement(Component, _extends({}, renderData), children || []);
     },
+
     methods: {
       init: function init() {
         document.body.appendChild(this.$el);
@@ -60,7 +73,8 @@ function instantiateComponent(Vue, Component, data, renderFn, options) {
         this.$destroy();
         document.body.removeChild(this.$el);
       }
-    }}));
+    }
+  }));
   instance.updateRenderData = function (data, render) {
     renderData = data;
     childrenRenderFn = render;
@@ -70,18 +84,18 @@ function instantiateComponent(Vue, Component, data, renderFn, options) {
   instance.init();
   var component = instance.$children[0];
   component.$updateProps = function (props) {
-    Object.assign(renderData.props, props);
+    _extends(renderData.props, props);
     instance.$forceUpdate();
   };
-  return component
+  return component;
 }
 
-function parseRenderData(data, events) {
-  if ( data === void 0 ) data = {};
-  if ( events === void 0 ) events = {};
+function parseRenderData() {
+  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   events = parseEvents(events);
-  var props = Object.assign({}, data);
+  var props = _extends({}, data);
   var on = {};
   for (var name in events) {
     if (events.hasOwnProperty(name)) {
@@ -95,22 +109,22 @@ function parseRenderData(data, events) {
   return {
     props: props,
     on: on
-  }
+  };
 }
 
 function parseEvents(events) {
   var parsedEvents = {};
   events.forEach(function (name) {
-    parsedEvents[name] = camelize(("on-" + name));
+    parsedEvents[name] = camelize('on-' + name);
   });
-  return parsedEvents
+  return parsedEvents;
 }
 
 var eventBeforeDestroy = 'hook:beforeDestroy';
 
-function apiCreator(Component, events, single) {
-  if ( events === void 0 ) events = [];
-  if ( single === void 0 ) single = false;
+function apiCreator(Component) {
+  var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var single = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   var Vue = this;
   var singleMap = {};
@@ -121,13 +135,15 @@ function apiCreator(Component, events, single) {
       before(renderData, renderFn, single);
     });
     var ownerInsUid = options.parent ? options.parent._uid : -1;
-    var ref = singleMap[ownerInsUid] ? singleMap[ownerInsUid] : {};
-    var comp = ref.comp;
-    var ins = ref.ins;
+
+    var _ref = singleMap[ownerInsUid] ? singleMap[ownerInsUid] : {},
+        comp = _ref.comp,
+        ins = _ref.ins;
+
     if (single && comp && ins) {
       ins.updateRenderData(renderData, renderFn);
       ins.$forceUpdate();
-      return comp
+      return comp;
     }
     var component = instantiateComponent(Vue, Component, renderData, renderFn, options);
     var instance = component.$parent;
@@ -144,13 +160,13 @@ function apiCreator(Component, events, single) {
     var originShow = component.show;
     component.show = function () {
       originShow && originShow.call(this);
-      return this
+      return this;
     };
 
     var originHide = component.hide;
     component.hide = function () {
       originHide && originHide.call(this);
-      return this
+      return this;
     };
 
     if (single) {
@@ -158,9 +174,8 @@ function apiCreator(Component, events, single) {
         comp: component,
         ins: instance
       };
-      
     }
-    return component
+    return component;
   }
 
   function processProps(ownerInstance, renderData, isInVueInstance, onChange) {
@@ -187,15 +202,14 @@ function apiCreator(Component, events, single) {
           watchKeys.forEach(function (key, i) {
             props[key] = ownerInstance[watchPropKeys[i]];
           });
-          return props
+          return props;
         }, onChange);
         ownerInstance.__unwatchFns__.push(unwatchFn);
       }
     }
   }
 
-  function processEvents(renderData, ownerInstance
-  ) {
+  function processEvents(renderData, ownerInstance) {
     var $events = renderData.props.$events;
     if ($events) {
       delete renderData.props.$events;
@@ -277,18 +291,20 @@ function apiCreator(Component, events, single) {
         component = null;
       }
 
-      return component
+      return component;
     }
   };
 
-  return api
+  return api;
 }
 
-var index = function (Vue, options) {
-  if ( options === void 0 ) options = {};
+function index (Vue) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _options$componentPre = options.componentPrefix,
+      componentPrefix = _options$componentPre === undefined ? '' : _options$componentPre,
+      _options$apiPrefix = options.apiPrefix,
+      apiPrefix = _options$apiPrefix === undefined ? '$create-' : _options$apiPrefix;
 
-  var componentPrefix = options.componentPrefix; if ( componentPrefix === void 0 ) componentPrefix = '';
-  var apiPrefix = options.apiPrefix; if ( apiPrefix === void 0 ) apiPrefix = '$create-';
 
   Vue.createAPI = function (Component, events, single) {
     if (isBoolean(events)) {
@@ -298,22 +314,23 @@ var index = function (Vue, options) {
     var api = apiCreator.call(this, Component, events, single);
     var createName = processComponentName(Component, {
       componentPrefix: componentPrefix,
-      apiPrefix: apiPrefix,
+      apiPrefix: apiPrefix
     });
     Vue.prototype[createName] = Component.$create = api.create;
-    return api
+    return api;
   };
-};
+}
 
 function processComponentName(Component, options) {
-  var componentPrefix = options.componentPrefix;
-  var apiPrefix = options.apiPrefix;
+  var componentPrefix = options.componentPrefix,
+      apiPrefix = options.apiPrefix;
+
   var name = Component.name;
   assert(name, 'Component must have name while using create-api!');
-  var prefixReg = new RegExp(("^" + (escapeReg(componentPrefix))), 'i');
+  var prefixReg = new RegExp('^' + escapeReg(componentPrefix), 'i');
   var pureName = name.replace(prefixReg, '');
-  var camelizeName = "" + (camelize(("" + apiPrefix + pureName)));
-  return camelizeName
+  var camelizeName = '' + camelize('' + apiPrefix + pureName);
+  return camelizeName;
 }
 
 export default index;

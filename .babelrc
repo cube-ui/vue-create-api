@@ -1,8 +1,15 @@
 {
   "presets": [
-    "env"
+    [
+      "env",
+      {
+        "modules": false
+      }
+    ]
   ],
   "plugins": [
-    "transform-object-rest-spread"
+    "transform-object-rest-spread",
+    "transform-object-assign",
+    "external-helpers"
   ]
 }

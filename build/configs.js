@@ -1,6 +1,6 @@
 const path = require('path')
-const buble = require('rollup-plugin-buble')
 const replace = require('rollup-plugin-replace')
+const babel = require('rollup-plugin-babel')
 const version = process.env.VERSION || require('../package.json').version
 const banner =
   `/**
@@ -31,7 +31,7 @@ const configs = {
   }
 }
 
-function genConfig(opts) {
+function genConfig (opts) {
   const config = {
     input: {
       input: opts.input,
@@ -39,8 +39,8 @@ function genConfig(opts) {
         replace({
           __VERSION__: version
         }),
-        buble({
-          objectAssign: 'Object.assign'
+        babel({
+          exclude: 'node_modules/**'
         })
       ]
     },
@@ -61,7 +61,7 @@ function genConfig(opts) {
   return config
 }
 
-function mapValues(obj, fn) {
+function mapValues (obj, fn) {
   const res = {}
   Object.keys(obj).forEach(key => {
     res[key] = fn(obj[key], key)
