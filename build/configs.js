@@ -31,7 +31,7 @@ const configs = {
   }
 }
 
-function genConfig (opts) {
+function genConfig(opts) {
   const config = {
     input: {
       input: opts.input,
@@ -40,7 +40,8 @@ function genConfig (opts) {
           __VERSION__: version
         }),
         babel({
-          exclude: 'node_modules/**'
+          exclude: 'node_modules/**',
+          plugins: ['external-helpers']
         })
       ]
     },
@@ -61,7 +62,7 @@ function genConfig (opts) {
   return config
 }
 
-function mapValues (obj, fn) {
+function mapValues(obj, fn) {
   const res = {}
   Object.keys(obj).forEach(key => {
     res[key] = fn(obj[key], key)

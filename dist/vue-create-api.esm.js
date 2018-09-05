@@ -298,7 +298,7 @@ function apiCreator(Component) {
   return api;
 }
 
-function index (Vue) {
+function install(Vue) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var _options$componentPre = options.componentPrefix,
       componentPrefix = _options$componentPre === undefined ? '' : _options$componentPre,
@@ -332,5 +332,10 @@ function processComponentName(Component, options) {
   var camelizeName = '' + camelize('' + apiPrefix + pureName);
   return camelizeName;
 }
+
+var index = {
+  install: install,
+  version: '1.0.0'
+};
 
 export default index;

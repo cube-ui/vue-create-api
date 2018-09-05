@@ -2,7 +2,7 @@ import { camelize, escapeReg, isBoolean } from './util'
 import { assert } from './debug'
 import apiCreator from './creator'
 
-export default function (Vue, options = {}) {
+function install(Vue, options = {}) {
   const {componentPrefix = '', apiPrefix = '$create-'} = options
 
   Vue.createAPI = function (Component, events, single) {
@@ -28,4 +28,9 @@ function processComponentName(Component, options) {
   const pureName = name.replace(prefixReg, '')
   let camelizeName = `${camelize(`${apiPrefix}${pureName}`)}`
   return camelizeName
+}
+
+export default {
+  install,
+  version: '__VERSION__'
 }
