@@ -45,9 +45,13 @@ function isFunction(fn) {
   return typeof fn === 'function';
 }
 
+function warn(msg) {
+  console.error("[vue-create-api warn]: " + msg);
+}
+
 function assert(condition, msg) {
   if (!condition) {
-    throw new Error("[create-api error]: " + msg);
+    throw new Error("[vue-create-api error]: " + msg);
   }
 }
 
@@ -150,11 +154,14 @@ function apiCreator(Component) {
     var originRemove = component.remove;
 
     component.remove = function () {
-      originRemove && originRemove.call(this);
-      instance.destroy();
       if (single) {
+        if (!singleMap[ownerInsUid]) {
+          return;
+        }
         singleMap[ownerInsUid] = null;
       }
+      originRemove && originRemove.call(this);
+      instance.destroy();
     };
 
     var originShow = component.show;
@@ -298,8 +305,16 @@ function apiCreator(Component) {
   return api;
 }
 
+var installed = false;
+
 function install(Vue) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  if (installed) {
+    warn('[vue-create-api] already installed. Vue.use(CreateAPI) should be called only once.');
+    return;
+  }
+  installed = true;
   var _options$componentPre = options.componentPrefix,
       componentPrefix = _options$componentPre === undefined ? '' : _options$componentPre,
       _options$apiPrefix = options.apiPrefix,
