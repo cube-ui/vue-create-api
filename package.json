@@ -2,7 +2,8 @@
   "name": "vue-create-api",
   "version": "1.0.0",
   "description": "A Vue plugin which make Vue component invocated by API.",
-  "main": "src/index.js",
+  "module": "dist/vue-create-api.esm.js",
+  "main": "dist/vue-create-api.js",
   "scripts": {
     "dev": "node examples/server.js",
     "build": "node build/build.js"
