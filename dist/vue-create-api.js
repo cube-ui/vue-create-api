@@ -1,5 +1,5 @@
 /**
- * vue-create-api v1.0.0
+ * vue-create-api v0.1.0
  * (c) 2018 ustbhuangyi
  * @license MIT
  */
@@ -356,7 +356,7 @@
 
   var index = {
     install: install,
-    version: '1.0.0'
+    version: '0.1.0'
   };
 
   return index;
