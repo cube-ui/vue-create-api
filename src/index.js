@@ -1,8 +1,15 @@
 import { camelize, escapeReg, isBoolean } from './util'
-import { assert } from './debug'
+import { assert, warn } from './debug'
 import apiCreator from './creator'
 
+let installed = false
+
 function install(Vue, options = {}) {
+  if (installed) {
+    warn('[vue-create-api] already installed. Vue.use(CreateAPI) should be called only once.')
+    return
+  }
+  installed = true
   const {componentPrefix = '', apiPrefix = '$create-'} = options
 
   Vue.createAPI = function (Component, events, single) {
