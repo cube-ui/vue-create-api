@@ -27,11 +27,14 @@ export default function apiCreator(Component, events = [], single = false) {
     const originRemove = component.remove
 
     component.remove = function () {
-      originRemove && originRemove.call(this)
-      instance.destroy()
       if (single) {
+        if (!singleMap[ownerInsUid]) {
+          return
+        }
         singleMap[ownerInsUid] = null
       }
+      originRemove && originRemove.call(this)
+      instance.destroy()
     }
 
     const originShow = component.show
