@@ -186,10 +186,8 @@ this.$createDialog({
     import CreateAPI from 'create-api'
     Vue.use(CreateAPI)
 
-    Vue.use(Dialog)
-
     // create this.$createHello API
-    createAPI(Vue, Hello, true)
+    Vue.createAPI(Vue, Hello, true)
 
     // init Vue
     new Vue({
