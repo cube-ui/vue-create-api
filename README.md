@@ -1,7 +1,7 @@
 # vue-create-api
 A Vue plugin which make Vue component invocated by API.
 
-[中文文档](https://github.com/cube-ui/vue-create-api/blob/master/README.md)
+[中文文档](https://github.com/cube-ui/vue-create-api/blob/master/README_zh-CN.md)
 
 ## Installing
 
