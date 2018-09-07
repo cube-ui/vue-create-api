@@ -1,6 +1,7 @@
 import { camelize, escapeReg, isBoolean } from './util'
 import { assert, warn } from './debug'
 import apiCreator from './creator'
+import instantiateComponent from './instantiate'
 
 let installed = false
 
@@ -39,5 +40,6 @@ function processComponentName(Component, options) {
 
 export default {
   install,
+  instantiateComponent,
   version: '__VERSION__'
 }
