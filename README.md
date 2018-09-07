@@ -1,6 +1,8 @@
 # vue-create-api
 A Vue plugin which make Vue component invocated by API.
 
+[中文文档](https://github.com/cube-ui/vue-create-api/blob/master/README.md)
+
 ## Installing
 
 use npm
@@ -85,7 +87,7 @@ this.$createDialog({
     | - | - | - | - | - |
     | config | Config options | Object | {} | - |
     | renderFn | Optional, used to generate the VNode child node in the slot scene in general | Function | - | function (createElement) {...} |
-    | single | Optional, whether the instantiated component is a singleton or not. If two parameters are provided and the `renderFn`'s type is not function, then the `single` value is the sencond parameter's value. | Boolean | single in createAPI() | - |
+    | single | Optional, whether the instantiated component is a singleton or not. If two parameters are provided and the `renderFn`'s type is not function, then the `single` value is the sencond parameter's value. | Boolean | true/false | single in createAPI() |
 
     **Config options `config`:**
 
@@ -201,7 +203,6 @@ this.$createDialog({
       },
       methods: {
         showHello() {
-          /* The first parameter of `$createHello` will be passed to the component as its props except the events in `events`(It will transform by default, eg: If `events` has value `['click']`, then the prop `onClick` will be treated as component's event and not component's props) */
           const instance = this.$createHello({
             $props: {
               content: 'My Hello Content',
@@ -235,7 +236,7 @@ import Hello from './Hello.vue'
 import CreateAPI from 'create-api'
 Vue.use(CreateAPI)
 
-// 创建 this.$createHello and $Hello.create API
+// create this.$createHello and Hello.create API
 Vue.createAPI(Hello, true)
 
 Hello.$create(config, renderFn)
