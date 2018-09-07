@@ -12,7 +12,6 @@ selenium-debug.log
 package/
 
 # Editor directories and files
-.idea
 .vscode
 *.suo
 *.ntvs*
