@@ -1,5 +1,5 @@
 /**
- * vue-create-api v0.1.0
+ * vue-create-api v0.2.0
  * (c) 2018 ustbhuangyi
  * @license MIT
  */
@@ -350,7 +350,8 @@ function processComponentName(Component, options) {
 
 var index = {
   install: install,
-  version: '0.1.0'
+  instantiateComponent: instantiateComponent,
+  version: '0.2.0'
 };
 
 export default index;
