@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import CreateAPI from '../src/index.js'
-import Dialog from '../examples/dialog/components/dialog.vue'
+import CreateAPI from '../../src/index.js'
+import Dialog from '../../examples/dialog/components/dialog.vue'
 
 Vue.config.productionTip = false
 
