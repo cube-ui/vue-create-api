@@ -10,5 +10,10 @@
   "plugins": [
     "transform-object-rest-spread",
     "transform-object-assign"
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": [ "istanbul" ]
+    }
+  }
 }
