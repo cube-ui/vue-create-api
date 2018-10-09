@@ -10,7 +10,7 @@ module.exports = function (config) {
     // 指定要运行测试的浏览器，可以指定多个。必须要安装对应的加载器(launcher)，karma 会在调起本地的浏览器。
     browsers: ['PhantomJS'],
     // 指定要使用的测试框架
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['mocha', 'sinon-chai'],
     // 这个插件会将每个测试用例的测试结果打印到命令行 console 中。
     reporters: ['spec', 'coverage'],
     coverageReporter: {
