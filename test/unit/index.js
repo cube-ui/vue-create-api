@@ -68,7 +68,8 @@ describe('create api 单元测试', function () {
         },
         onClick: () => {},
         $events: {
-          change: () => {}
+          change: () => {},
+          test: 'test'
         },
         $class: {
           'my-class': true
@@ -82,7 +83,7 @@ describe('create api 单元测试', function () {
   })
 
   describe('#createAPI in Vue instance', function() {
-    it('expect to update when $props in ownInstance', function() {
+    it('expect to update when $props in ownInstance change', function() {
       Vue.createAPI(Dialog, true)
 
       const instance = new Vue({
@@ -118,7 +119,7 @@ describe('create api 单元测试', function () {
       instance.$el.querySelectorAll('button')[0].click()
 
       setTimeout(() => {
-        expect(document.querySelector('.dialog .content')).to.equal('I am from App')
+        expect(document.querySelector('.dialog .content').textContent).to.equal('I am from App')
 
         instance.$destroy()
 
