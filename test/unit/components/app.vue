@@ -17,7 +17,13 @@
           $props: {
             title: 'Hello',
             content: 'content'
+          },
+          // to improve coverage rate
+          $events: {
+            test: 'changeContent'
           }
+        }, (h) => {
+          return h('p', 'I am default slot')
         }).show()
       },
       changeContent() {

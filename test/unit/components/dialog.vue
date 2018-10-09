@@ -4,6 +4,7 @@
       <h1 class="title">{{title}}</h1>
       <div class="content">{{content}}</div>
       <div @click="hide" class="btn">confirm</div>
+      <slot></slot>
     </div>
   </div>
 </template>
