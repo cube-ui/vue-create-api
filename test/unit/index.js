@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import CreateAPI from '../../src/index.js'
-import Dialog from '../../examples/dialog/components/dialog.vue'
-import App from '../../examples/dialog/components/App.vue'
+import Dialog from './components/dialog.vue'
+import App from './components/app.vue'
 
 Vue.config.productionTip = false
 
@@ -13,7 +13,7 @@ describe('create api 单元测试', function () {
   })
 
   describe('#Vue.use', function() {
-    it('expect to create Dialog API', function () {
+    it('expect to add createDialog API', function () {
       expect(Vue.createAPI).to.be.a('function')
       
       Vue.createAPI(Dialog, true)
@@ -24,66 +24,92 @@ describe('create api 单元测试', function () {
   })
 
   describe('#CreateAPI in pure JS', function () {
-    it('expect to render correct content', function () {
-      Vue.createAPI(Dialog, true)
+    let dialog
+    let api
+    before(() => {
+      api = Vue.createAPI(Dialog, ['click'], true)
+    })
+    after(() => {
+      dialog.$parent.destroy()
+    })
 
-      const dialog = Dialog.$create({
-        $props: {
-          title: 'Hello',
-          content: 'I am from pure JS'
-        }
+    // 测试正确渲染内容
+    it('expect to render correct content', function () {
+      dialog = Dialog.$create({
+        title: 'Hello',
+        content: 'I am from pure JS1'
       })
 
       dialog.show()
       dialog.hide()
-  
+
       let content = document.querySelector('.dialog .content')
-      expect(content.textContent).to.equal('I am from pure JS')
+      expect(content.textContent).to.equal('I am from pure JS1')
     })
 
-    it('expect to add beforeHooks', function () {
-      const api = Vue.createAPI(Dialog, true)
-
+    // 测试 beforeHooks 能够正常执行
+    it('expect to execuate beforeHooks', function () {
       const fake = sinon.fake()
 
       api.before(fake)
 
-      Dialog.$create({
-        $props: {
-          title: 'Hello',
-          content: 'I am from pure JS'
-        }
-      }).show()
+      dialog = Dialog.$create()
   
       expect(fake).to.be.called
     })
 
-    it('expect to parse all config options', function() {
-      Vue.createAPI(Dialog, ['click'], true)
-
-      const dialog = Dialog.$create({
+    // 测试配置项支持 $event
+    it('expect config options to support $props/$event', function(done) {
+      dialog = Dialog.$create({
         $props: {
           title: 'Hello',
-          content: 'I am from pure JS'
+          content: 'I am from pure JS1'
         },
-        onClick: () => {},
         $events: {
-          change: () => {},
-          test: 'test'
-        },
-        $class: {
-          'my-class': true
+          change: () => {}
         }
-      }).show()
+      })
 
-      expect(Object.keys(dialog.$listeners)).to.include('click')
-      expect(Object.keys(dialog.$listeners)).to.include('change')
-      expect(Array.prototype.slice.apply(dialog.$el.classList)).to.include('my-class')
+      dialog.$nextTick(() => {
+        expect(Object.keys(dialog.$listeners)).to.include('change')
+        done()
+      })
+    })
+
+    // 测试配置项支持 on* 形式指定 事件回调
+    it(`expect config options to support 'on'`, function(done) {
+      dialog = Dialog.$create({
+        title: 'Hello',
+        content: 'I am from pure JS2',
+        onClick: () => {},
+      })
+
+      dialog.$nextTick(() => {
+        expect(Object.keys(dialog.$listeners)).to.include('click')
+
+        let content = document.querySelector('.dialog .content')
+        expect(content.textContent).to.equal('I am from pure JS2')
+        done()
+      })
+    })
+
+    // 测试配置项支持任何 Vue 配置
+    it(`expect config options to support $xx`, function(done) {
+      dialog = Dialog.$create({
+        $class: ['my-class'],
+      })
+
+      dialog.$nextTick(() => {
+        const classList = Array.prototype.slice.apply(dialog.$el.classList)
+        expect(classList).to.include('my-class')
+        done()
+      })
     })
   })
 
   describe('#createAPI in Vue instance', function() {
-    it('expect to update when $props in ownInstance change', function() {
+    let app
+    before(() => {
       Vue.createAPI(Dialog, true)
 
       const instance = new Vue({
@@ -93,22 +119,43 @@ describe('create api 单元测试', function () {
 
       document.body.appendChild(instance.$el)
 
-      instance.$el.querySelectorAll('button')[0].click()
+      app = instance.$children[0]
+    })
 
-      setTimeout(() => {
+    it('expect to update when $props in ownInstance change', function(done) {
+      app.showDialog()
+
+      app.$nextTick(() => {
         let text = document.querySelector('.dialog .content').textContent
         expect(text).to.equal('I am from App')
 
-        instance.$children[0].change()
+        app.changeContent()
+        app.$nextTick(() => {
 
-        text = document.querySelector('.dialog .content').textContent
-        expect(text).to.equal('I am from App and content changed!')
-      }, 0)
+          text = document.querySelector('.dialog .content').textContent
+          expect(text).to.equal('I am from App and content changed!')
+
+          done()
+        })
+      })
     })
 
-    it('expect to remove dom before destory', function() {
-      Vue.createAPI(Dialog, true)
+    it('expect to remove dom before destory', function(done) {
+      app.showDialog()
 
+      app.$nextTick(() => {
+        app.$parent.$destroy()
+
+        expect(document.querySelector('.dialog')).to.be.null
+
+        done()
+      })
+    })
+  })
+
+  describe('#Single mode', function() {
+    let app
+    before(() => {
       const instance = new Vue({
         render: h => h(App),
         components: { App }
@@ -116,15 +163,32 @@ describe('create api 单元测试', function () {
 
       document.body.appendChild(instance.$el)
 
-      instance.$el.querySelectorAll('button')[0].click()
+      app = instance.$children[0]
+    })
 
-      setTimeout(() => {
-        expect(document.querySelector('.dialog .content').textContent).to.equal('I am from App')
+    // 测试单例模式 返回同一个实例
+    it('expect to return the same components in single mode', function() {
+      Vue.createAPI(Dialog, true)
+      const dialog1 = app.showDialog()
+      const dialog2 = app.showAnotherDialog()
+      expect(dialog1 === dialog2).to.be.true
 
-        instance.$destroy()
+      dialog1.$parent.destroy()
+    })
+    // 测试非单例模式 返回多个实例
+    it('expect to return different components when not in single mode', function(done) {
+      Vue.createAPI(Dialog, false)
+      const dialog1 = app.showDialog()
+      const dialog2 = app.showAnotherDialog()
+      expect(dialog1 === dialog2).to.be.false
 
-        expect(document.querySelector('.dialog')).to.be.undefined
-      }, 0)
+      Vue.nextTick(() => {
+        const dialogs = document.querySelectorAll('.dialog')
+        const length = Array.prototype.slice.apply(dialogs).length
+        expect(length).to.equal(2)
+
+        done()
+      })
     })
   })
 })
