@@ -10,7 +10,7 @@
 $ npm install vue-create-api
 ```
 
-通过 cdn 
+通过 cdn
 
 ```
 <script src="https://unpkg.com/vue-create-api/dist/vue-create-api.min.js"></script>
@@ -84,8 +84,8 @@ this.$createDialog({
     | 名称 | 描述 | 类型 | 可选值 | 默认值 |
     | - | - | - | - | - |
     | config | 配置参数 | Object | {} | - |
-    | renderFn | 可选参数，用于生成子 VNode 节点，通常通常用于处理插槽 | Function | - | function (createElement) {...} |
-    | single | 可选参数, 决定示例化是否采用单例模式。在没有传递 renderFn 时，可以直接作为第二个参数传入。 | Boolean | true/false | 调用 createAPI 时传入的 single 值 |
+    | renderFn | 可选参数，用于生成子 VNode 节点，通常用于处理插槽 | Function | - | function (createElement) {...} |
+    | single | 可选参数, 决定实例化是否采用单例模式。在没有传递 renderFn 时，可以直接作为第二个参数传入。 | Boolean | true/false | 调用 createAPI 时传入的 single 值 |
 
     **配置项 `config`:**
 
@@ -185,7 +185,7 @@ this.$createDialog({
     Vue.use(CreateAPI)
 
     // 得到 this.$createHello API，它会添加到 Vue 原型上
-    Vue.createAPI(Vue, Hello, true)
+    Vue.createAPI(Hello, true)
 
     // 实例化 Vue
     new Vue({
