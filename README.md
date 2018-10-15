@@ -11,7 +11,7 @@ use npm
 $ npm install vue-create-api
 ```
 
-use cdn 
+use cdn
 
 ```
 <script src="https://unpkg.com/vue-create-api/dist/vue-create-api.min.js"></script>
@@ -189,7 +189,7 @@ this.$createDialog({
     Vue.use(CreateAPI)
 
     // create this.$createHello API
-    Vue.createAPI(Vue, Hello, true)
+    Vue.createAPI(Hello, true)
 
     // init Vue
     new Vue({
