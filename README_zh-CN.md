@@ -19,7 +19,7 @@ $ npm install vue-create-api
 ## 使用
 
 ``` js
-import CreateAPI from 'create-api'
+import CreateAPI from 'vue-create-api'
 
 Vue.use(CreateAPI)
 
@@ -181,7 +181,7 @@ this.$createDialog({
   ```js
     import Vue from 'vue'
     import Hello from './Hello.vue'
-    import CreateAPI from 'create-api'
+    import CreateAPI from 'vue-create-api'
     Vue.use(CreateAPI)
 
     // 得到 this.$createHello API，它会添加到 Vue 原型上
@@ -230,7 +230,7 @@ this.$createDialog({
 ```js
 import Vue from 'vue'
 import Hello from './Hello.vue'
-import CreateAPI from 'create-api'
+import CreateAPI from 'vue-create-api'
 Vue.use(CreateAPI)
 
 // 得到 Vue.prototype.$createHello 和 Hello.create API
