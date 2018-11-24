@@ -20,7 +20,7 @@ use cdn
 ## Usage
 
 ``` js
-import CreateAPI from 'create-api'
+import CreateAPI from 'vue-create-api'
 
 Vue.use(CreateAPI)
 
@@ -185,7 +185,7 @@ this.$createDialog({
   ```js
     import Vue from 'vue'
     import Hello from './Hello.vue'
-    import CreateAPI from 'create-api'
+    import CreateAPI from 'vue-create-api'
     Vue.use(CreateAPI)
 
     // create this.$createHello API
@@ -233,7 +233,7 @@ In vue component, you can call by `this.$createHello(config, renderFn)` because 
 ```js
 import Vue from 'vue'
 import Hello from './Hello.vue'
-import CreateAPI from 'create-api'
+import CreateAPI from 'vue-create-api'
 Vue.use(CreateAPI)
 
 // create this.$createHello and Hello.create API
