@@ -1,7 +1,7 @@
 import Vue, { Component, PluginFunction, ComponentOptions, VNode, CreateElement } from 'vue'
 
 declare module 'vue/types/vue' {
-  export interface Vue {
+  export interface VueConstructor {
     createAPI: (Component: Component, events?: string[], single?: boolean) => Api
   }
 }
