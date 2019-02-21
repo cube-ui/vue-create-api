@@ -4,6 +4,7 @@
   "description": "A Vue plugin which make Vue component invocated by API.",
   "module": "dist/vue-create-api.esm.js",
   "main": "dist/vue-create-api.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "dev": "node examples/server.js",
     "build": "node build/build.js",
