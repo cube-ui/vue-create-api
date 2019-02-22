@@ -90,6 +90,9 @@ declare module 'vue/types/vue' {
   }
 }
 ```
+### 提示
+
+> 使用typescript时, `terser-webpack-plugin`(vue-cli3.x)或`uglifyjs`(vue-cli2.x)增加`{ keep_fnames: true }`
 
 ## 构造器配置项
 

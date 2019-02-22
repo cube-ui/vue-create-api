@@ -93,6 +93,9 @@ declare module 'vue/types/vue' {
   }
 }
 ```
+### Tip
+
+> using typescript, `terser-webpack-plugin`(vue-cli3.x) or `uglifyjs`(vue-cli2.x) adds `{ keep_fnames: true }`
 
 ## Constructor Options
 
