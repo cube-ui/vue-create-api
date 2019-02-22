@@ -15,9 +15,15 @@ export interface renderFunction {
   (createElement: CreateElement): VNode
 }
 
+export interface createFunction<V extends Vue> {
+  (options: object, renderFn: renderFunction, single?: boolean):V
+  (options: object, renderFn?: renderFunction):V
+  (options: object, single?: renderFunction):V
+}
+
 export interface Api {
   before: (config: object,renderFn: renderFunction, single: boolean) => void,
-  create: (config: object,renderFn: renderFunction, single: boolean) => Component
+  create: createFunction<Vue>
 }
 
 export interface instantiateComponent {
