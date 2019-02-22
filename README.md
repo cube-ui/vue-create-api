@@ -59,6 +59,41 @@ this.$createDialog({
 }).show()
 ```
 
+```ts
+// typescript
+import createAPIComponent from 'vue-create-api'
+import { Component, VueConstructor } from 'vue'
+
+export default function createAPI (Vue: VueConstructor, Component: Component, events?: string[], single?: boolean) {
+  Vue.use(createAPIComponent, { componentPrefix: 'cube-', apiPrefix: '$create-' })
+  const api = Vue.createAPI(Component, events, single)
+  return api
+}
+```
+```ts
+// d.ts
+import Vue, { VueConstructor } from 'vue'
+import { renderFunction } from 'vue-create-api';
+
+export declare class UIComponent extends Vue {
+  show ():void
+  hide ():void
+}
+
+interface createFunction {
+  (options: object, renderFn: renderFunction, single?: boolean):UIComponent
+  (options: object, renderFn?: renderFunction):UIComponent
+  (options: object, single?: renderFunction):UIComponent
+}
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    /** create Dialog instance */
+    $createDialog: createFunction
+  }
+}
+```
+
 ## Constructor Options
 
 |key|description|default|
