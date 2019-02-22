@@ -38,3 +38,5 @@ export interface CreateAPI {
 
 declare const CreateAPI: CreateAPI
 export default CreateAPI
+
+// todo 扩展Component.$create方法

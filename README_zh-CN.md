@@ -58,14 +58,18 @@ this.$createDialog({
 ```
 ```ts
 // typescript 使用方式
-import createAPIComponent from 'vue-create-api'
-import { Component, VueConstructor } from 'vue'
+import CreateAPI from 'vue-create-api'
 
-export default function createAPI (Vue: VueConstructor, Component: Component, events?: string[], single?: boolean) {
-  Vue.use(createAPIComponent, { componentPrefix: 'cube-', apiPrefix: '$create-' })
-  const api = Vue.createAPI(Component, events, single)
-  return api
-}
+Vue.use(CreateAPI)
+
+Vue.createAPI(Dialog, events, single)
+
+this.$createDialog({
+  $props: {
+    title: 'Hello',
+    content: 'I am from a vue component'
+  }
+}).show()
 ```
 ```ts
 // 自定义 d.ts 扩展通过api创建的方法
