@@ -59,6 +59,42 @@ this.$createDialog({
 }).show()
 ```
 
+```ts
+// typescript
+import CreateAPI from 'vue-create-api'
+
+Vue.use(CreateAPI)
+
+Vue.createAPI(Dialog, events, single)
+
+this.$createDialog({
+  $props: {
+    title: 'Hello',
+    content: 'I am from a vue component'
+  }
+}).show()
+```
+```ts
+// d.ts
+import Vue, { VueConstructor } from 'vue'
+import { createFunction } from 'vue-create-api';
+
+export declare class UIComponent extends Vue {
+  show ():void
+  hide ():void
+}
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    /** create Dialog instance */
+    $createDialog: createFunction<UIComponent>
+  }
+}
+```
+### Tip
+
+> using typescript, `terser-webpack-plugin`(vue-cli3.x) or `uglifyjs`(vue-cli2.x) adds `{ keep_fnames: true }`
+
 ## Constructor Options
 
 |key|description|default|

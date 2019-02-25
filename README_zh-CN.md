@@ -56,6 +56,41 @@ this.$createDialog({
   },
 }).show()
 ```
+```ts
+// typescript 使用方式
+import CreateAPI from 'vue-create-api'
+
+Vue.use(CreateAPI)
+
+Vue.createAPI(Dialog, events, single)
+
+this.$createDialog({
+  $props: {
+    title: 'Hello',
+    content: 'I am from a vue component'
+  }
+}).show()
+```
+```ts
+// 自定义 d.ts 扩展通过api创建的方法
+import Vue, { VueConstructor } from 'vue'
+import { createFunction } from 'vue-create-api';
+
+export declare class UIComponent extends Vue {
+  show ():void
+  hide ():void
+}
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    /** create Dialog instance */
+    $createDialog: createFunction<UIComponent>
+  }
+}
+```
+### 提示
+
+> 使用typescript时, `terser-webpack-plugin`(vue-cli3.x)或`uglifyjs`(vue-cli2.x)增加`{ keep_fnames: true }`
 
 ## 构造器配置项
 
