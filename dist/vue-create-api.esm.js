@@ -1,6 +1,6 @@
 /**
- * vue-create-api v0.2.0
- * (c) 2018 ustbhuangyi
+ * vue-create-api v0.2.1
+ * (c) 2019 ustbhuangyi
  * @license MIT
  */
 var _extends = Object.assign || function (target) {
@@ -43,10 +43,6 @@ function isStr(value) {
 
 function isFunction(fn) {
   return typeof fn === 'function';
-}
-
-function warn(msg) {
-  console.error("[vue-create-api warn]: " + msg);
 }
 
 function assert(condition, msg) {
@@ -305,16 +301,8 @@ function apiCreator(Component) {
   return api;
 }
 
-var installed = false;
-
 function install(Vue) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  if (installed) {
-    warn('[vue-create-api] already installed. Vue.use(CreateAPI) should be called only once.');
-    return;
-  }
-  installed = true;
   var _options$componentPre = options.componentPrefix,
       componentPrefix = _options$componentPre === undefined ? '' : _options$componentPre,
       _options$apiPrefix = options.apiPrefix,
@@ -351,7 +339,7 @@ function processComponentName(Component, options) {
 var index = {
   install: install,
   instantiateComponent: instantiateComponent,
-  version: '0.2.0'
+  version: '0.2.1'
 };
 
 export default index;
