@@ -33,19 +33,19 @@ export default function apiCreator(Component, events = [], single = false) {
         }
         singleMap[ownerInsUid] = null
       }
-      originRemove && originRemove.call(this)
+      originRemove && originRemove.apply(this, arguments)
       instance.destroy()
     }
 
     const originShow = component.show
     component.show = function () {
-      originShow && originShow.call(this)
+      originShow && originShow.apply(this, arguments)
       return this
     }
 
     const originHide = component.hide
     component.hide = function () {
-      originHide && originHide.call(this)
+      originHide && originHide.apply(this, arguments)
       return this
     }
 
