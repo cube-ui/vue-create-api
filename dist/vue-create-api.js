@@ -1,5 +1,5 @@
 /**
- * vue-create-api v0.2.1
+ * vue-create-api v0.2.2
  * (c) 2019 ustbhuangyi
  * @license MIT
  */
@@ -162,19 +162,19 @@
           }
           singleMap[ownerInsUid] = null;
         }
-        originRemove && originRemove.call(this);
+        originRemove && originRemove.apply(this, arguments);
         instance.destroy();
       };
 
       var originShow = component.show;
       component.show = function () {
-        originShow && originShow.call(this);
+        originShow && originShow.apply(this, arguments);
         return this;
       };
 
       var originHide = component.hide;
       component.hide = function () {
-        originHide && originHide.call(this);
+        originHide && originHide.apply(this, arguments);
         return this;
       };
 
@@ -345,7 +345,7 @@
   var index = {
     install: install,
     instantiateComponent: instantiateComponent,
-    version: '0.2.1'
+    version: '0.2.2'
   };
 
   return index;
