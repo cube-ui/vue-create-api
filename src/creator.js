@@ -6,7 +6,6 @@ const eventBeforeDestroy = 'hook:beforeDestroy'
 
 export default function apiCreator(Component, events = [], single = false) {
   let Vue = this
-  let currentSingleComp
   let singleMap = {}
   const beforeHooks = []
 
@@ -19,7 +18,6 @@ export default function apiCreator(Component, events = [], single = false) {
     if (single && comp && ins) {
       ins.updateRenderData(renderData, renderFn)
       ins.$forceUpdate()
-      currentSingleComp = comp
       return comp
     }
     const component = instantiateComponent(Vue, Component, renderData, renderFn, options)
@@ -54,7 +52,6 @@ export default function apiCreator(Component, events = [], single = false) {
         comp: component,
         ins: instance
       }
-      currentSingleComp = comp
     }
     return component
   }
