@@ -14,7 +14,9 @@ export default function instantiateComponent(Vue, Component, data, renderFn, opt
     },
     methods: {
       init() {
-        document.body.appendChild(this.$el)
+        const el = document.createElement('div')
+        document.body.appendChild(el)
+        this.$mount(el)
       },
       destroy() {
         this.$destroy()
@@ -27,7 +29,6 @@ export default function instantiateComponent(Vue, Component, data, renderFn, opt
     childrenRenderFn = render
   }
   instance.updateRenderData(data, renderFn)
-  instance.$mount()
   instance.init()
   const component = instance.$children[0]
   component.$updateProps = function (props) {
