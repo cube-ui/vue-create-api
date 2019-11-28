@@ -18,7 +18,9 @@ export default function instantiateComponent(Vue, Component, data, renderFn, opt
       },
       destroy() {
         this.$destroy()
-        document.body.removeChild(this.$el)
+        if (this.$el && this.$el.parentNode === document.body) {
+          document.body.removeChild(this.$el)
+        }
       }
     }
   })
