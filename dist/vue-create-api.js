@@ -1,5 +1,5 @@
 /**
- * vue-create-api v0.2.2
+ * vue-create-api v0.2.3
  * (c) 2019 ustbhuangyi
  * @license MIT
  */
@@ -77,7 +77,9 @@
         },
         destroy: function destroy() {
           this.$destroy();
-          document.body.removeChild(this.$el);
+          if (this.$el && this.$el.parentNode === document.body) {
+            document.body.removeChild(this.$el);
+          }
         }
       }
     }));
@@ -345,7 +347,7 @@
   var index = {
     install: install,
     instantiateComponent: instantiateComponent,
-    version: '0.2.2'
+    version: '0.2.3'
   };
 
   return index;
