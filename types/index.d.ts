@@ -35,7 +35,7 @@ export interface PluginFn {
 }
 
 export interface PluginObject {
-  install(ctx: Ctx, ...args: any): void
+  install: PluginFn
 }
 
 export interface Event {
