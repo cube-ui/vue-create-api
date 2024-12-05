@@ -2,6 +2,12 @@ import { camelize, escapeReg, isBoolean } from './util'
 import { assert, warn } from './debug'
 import apiCreator from './creator'
 import instantiateComponent from './instantiate'
+import EventBus from './events'
+
+const ctx = {
+  plugins: [],
+  ...EventBus
+}
 
 function install(Vue, options = {}) {
   const {componentPrefix = '', apiPrefix = '$create-'} = options
@@ -11,7 +17,7 @@ function install(Vue, options = {}) {
       single = events
       events = []
     }
-    const api = apiCreator.call(this, Component, events, single)
+    const api = apiCreator.call(this, Component, events, single, ctx)
     const createName = processComponentName(Component, {
       componentPrefix,
       apiPrefix,
@@ -19,6 +25,20 @@ function install(Vue, options = {}) {
     Vue.prototype[createName] = Component.$create = api.create
     return api
   }
+}
+
+function use(plugin, ...args) {
+  if (ctx.plugins.find(p => p === plugin)) {
+    return ctx
+  }
+  args.unshift(ctx)
+  if (typeof plugin.install === 'function') {
+    plugin.install.apply(plugin, args)
+  } else if (typeof plugin === 'function') {
+    plugin.apply(null, args)
+  }
+  ctx.plugins.push(plugin)
+  return ctx
 }
 
 function processComponentName(Component, options) {
@@ -32,6 +52,7 @@ function processComponentName(Component, options) {
 }
 
 export default {
+  use,
   install,
   instantiateComponent,
   version: '__VERSION__'

@@ -4,7 +4,7 @@ import { isFunction, isUndef, isStr } from './util'
 
 const eventBeforeDestroy = 'hook:beforeDestroy'
 
-export default function apiCreator(Component, events = [], single = false) {
+export default function apiCreator(Component, events = [], single = false, ctx) {
   let Vue = this
   let singleMap = {}
   const beforeHooks = []
@@ -53,6 +53,13 @@ export default function apiCreator(Component, events = [], single = false) {
         ins: instance
       }
     }
+    function destroy() {
+      component.remove()
+      setTimeout(() => {
+        ctx.off(ctx.Event.InstanceDestroy, destroy)
+      })
+    }
+    ctx.on(ctx.Event.InstanceDestroy, destroy)
     return component
   }
 

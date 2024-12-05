@@ -1,6 +1,6 @@
 /**
  * vue-create-api v0.2.3
- * (c) 2019 ustbhuangyi
+ * (c) 2024 ustbhuangyi
  * @license MIT
  */
 var _extends = Object.assign || function (target) {
@@ -15,6 +15,16 @@ var _extends = Object.assign || function (target) {
   }
 
   return target;
+};
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
 };
 
 var camelizeRE = /-(\w)/g;
@@ -127,6 +137,7 @@ var eventBeforeDestroy = 'hook:beforeDestroy';
 function apiCreator(Component) {
   var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var single = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var ctx = arguments[3];
 
   var Vue = this;
   var singleMap = {};
@@ -180,6 +191,13 @@ function apiCreator(Component) {
         ins: instance
       };
     }
+    function destroy() {
+      component.remove();
+      setTimeout(function () {
+        ctx.off(ctx.Event.InstanceDestroy, destroy);
+      });
+    }
+    ctx.on(ctx.Event.InstanceDestroy, destroy);
     return component;
   }
 
@@ -303,6 +321,51 @@ function apiCreator(Component) {
   return api;
 }
 
+var EventBus = {
+  Event: {
+    InstanceDestroy: 'instance:destroy'
+  },
+  events: {},
+  on: function on(name, handler) {
+    var list = this.events[name];
+    if (!list) {
+      this.events[name] = [handler];
+    } else if (!list.find(function (f) {
+      return f === handler;
+    })) {
+      list.push(handler);
+    }
+  },
+  emit: function emit(name) {
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    var list = this.events[name];
+    if (!list) {
+      return;
+    }
+    list.forEach(function (handler) {
+      handler.apply(undefined, toConsumableArray(args));
+    });
+  },
+  off: function off(name, handler) {
+    if (!handler) {
+      delete this.events[name];
+    } else {
+      var list = this.events[name];
+      var index = list && list.findIndex(function (fn) {
+        return fn === handler;
+      });
+      index > -1 && list.splice(index, 1);
+    }
+  }
+};
+
+var ctx = _extends({
+  plugins: []
+}, EventBus);
+
 function install(Vue) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var _options$componentPre = options.componentPrefix,
@@ -316,7 +379,7 @@ function install(Vue) {
       single = events;
       events = [];
     }
-    var api = apiCreator.call(this, Component, events, single);
+    var api = apiCreator.call(this, Component, events, single, ctx);
     var createName = processComponentName(Component, {
       componentPrefix: componentPrefix,
       apiPrefix: apiPrefix
@@ -324,6 +387,27 @@ function install(Vue) {
     Vue.prototype[createName] = Component.$create = api.create;
     return api;
   };
+}
+
+function use(plugin) {
+  if (ctx.plugins.find(function (p) {
+    return p === plugin;
+  })) {
+    return ctx;
+  }
+
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  args.unshift(ctx);
+  if (typeof plugin.install === 'function') {
+    plugin.install.apply(plugin, args);
+  } else if (typeof plugin === 'function') {
+    plugin.apply(null, args);
+  }
+  ctx.plugins.push(plugin);
+  return ctx;
 }
 
 function processComponentName(Component, options) {
@@ -339,6 +423,7 @@ function processComponentName(Component, options) {
 }
 
 var index = {
+  use: use,
   install: install,
   instantiateComponent: instantiateComponent,
   version: '0.2.3'
