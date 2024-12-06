@@ -372,6 +372,27 @@
     plugins: []
   }, EventBus);
 
+  function use(plugin) {
+    if (ctx.plugins.find(function (p) {
+      return p === plugin;
+    })) {
+      return ctx;
+    }
+
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    args.unshift(ctx);
+    if (typeof plugin.install === 'function') {
+      plugin.install.apply(plugin, args);
+    } else if (typeof plugin === 'function') {
+      plugin.apply(null, args);
+    }
+    ctx.plugins.push(plugin);
+    return ctx;
+  }
+
   function install(Vue) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var _options$componentPre = options.componentPrefix,
@@ -393,27 +414,6 @@
       Vue.prototype[createName] = Component.$create = api.create;
       return api;
     };
-  }
-
-  function use(plugin) {
-    if (ctx.plugins.find(function (p) {
-      return p === plugin;
-    })) {
-      return ctx;
-    }
-
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    args.unshift(ctx);
-    if (typeof plugin.install === 'function') {
-      plugin.install.apply(plugin, args);
-    } else if (typeof plugin === 'function') {
-      plugin.apply(null, args);
-    }
-    ctx.plugins.push(plugin);
-    return ctx;
   }
 
   function processComponentName(Component, options) {

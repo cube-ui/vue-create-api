@@ -9,6 +9,20 @@ const ctx = {
   ...EventBus
 }
 
+function use(plugin, ...args) {
+  if (ctx.plugins.find(p => p === plugin)) {
+    return ctx
+  }
+  args.unshift(ctx)
+  if (typeof plugin.install === 'function') {
+    plugin.install.apply(plugin, args)
+  } else if (typeof plugin === 'function') {
+    plugin.apply(null, args)
+  }
+  ctx.plugins.push(plugin)
+  return ctx
+}
+
 function install(Vue, options = {}) {
   const {componentPrefix = '', apiPrefix = '$create-'} = options
 
@@ -25,20 +39,6 @@ function install(Vue, options = {}) {
     Vue.prototype[createName] = Component.$create = api.create
     return api
   }
-}
-
-function use(plugin, ...args) {
-  if (ctx.plugins.find(p => p === plugin)) {
-    return ctx
-  }
-  args.unshift(ctx)
-  if (typeof plugin.install === 'function') {
-    plugin.install.apply(plugin, args)
-  } else if (typeof plugin === 'function') {
-    plugin.apply(null, args)
-  }
-  ctx.plugins.push(plugin)
-  return ctx
 }
 
 function processComponentName(Component, options) {
