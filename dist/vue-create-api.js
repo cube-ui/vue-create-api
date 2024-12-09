@@ -197,13 +197,6 @@
           ins: instance
         };
       }
-      function destroy() {
-        component.remove();
-        setTimeout(function () {
-          ctx.off(ctx.Event.InstanceDestroy, destroy);
-        });
-      }
-      ctx.on(ctx.Event.InstanceDestroy, destroy);
       return component;
     }
 
@@ -308,16 +301,22 @@
         processEvents(renderData, ownerInstance);
         process$(renderData);
 
-        component = createComponent(renderData, renderFn, options, _single);
+        var _ref2 = singleMap[options.parent ? options.parent._uid : -1] || {},
+            comp = _ref2.comp;
 
-        if (isInVueInstance) {
-          ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
-        }
+        component = createComponent(renderData, renderFn, options, _single);
 
         function beforeDestroy() {
           cancelWatchProps(ownerInstance);
           component.remove();
           component = null;
+        }
+
+        if (isInVueInstance) {
+          ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
+        } else if (!_single || !comp) {
+          // 非单例，或者单例第一次创建
+          ctx.once(ctx.Event.InstanceDestroy, beforeDestroy);
         }
 
         return component;
@@ -342,18 +341,30 @@
         list.push(handler);
       }
     },
-    emit: function emit(name) {
-      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
+    once: function once(name, handler) {
+      var _this = this;
 
+      var wrapper = function wrapper() {
+        handler.apply(undefined, arguments);
+        _this.off(name, wrapper);
+      };
+      this.on(name, wrapper);
+    },
+    emit: function emit(name) {
       var list = this.events[name];
       if (!list) {
         return;
       }
-      list.forEach(function (handler) {
+      // 从后往前遍历，避免遍历的时候删除元素，导致不正确的结果产生
+
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      for (var i = list.length - 1; i >= 0; i--) {
+        var handler = list[i];
         handler.apply(undefined, toConsumableArray(args));
-      });
+      }
     },
     off: function off(name, handler) {
       if (!handler) {

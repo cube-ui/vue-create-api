@@ -47,6 +47,7 @@ export interface Ctx {
   Event: Event
   events: Record<string, Function>
   on(name: string, handler: Function): void
+  once(name: string, handler: Function): void
   emit(name: string, ...args: any): void
   off(name: string, handler: Function): void
 }

@@ -53,13 +53,6 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
         ins: instance
       }
     }
-    function destroy() {
-      component.remove()
-      setTimeout(() => {
-        ctx.off(ctx.Event.InstanceDestroy, destroy)
-      })
-    }
-    ctx.on(ctx.Event.InstanceDestroy, destroy)
     return component
   }
 
@@ -165,16 +158,20 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       processEvents(renderData, ownerInstance)
       process$(renderData)
 
-      component = createComponent(renderData, renderFn, options, _single)
+      const { comp } = singleMap[options.parent ? options.parent._uid : -1] || {}
 
-      if (isInVueInstance) {
-        ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
-      }
+      component = createComponent(renderData, renderFn, options, _single)
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance)
         component.remove()
         component = null
+      }
+
+      if (isInVueInstance) {
+        ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
+      } else if (!_single || !comp) { // 非单例，或者单例第一次创建
+        ctx.once(ctx.Event.InstanceDestroy, beforeDestroy)
       }
 
       return component
