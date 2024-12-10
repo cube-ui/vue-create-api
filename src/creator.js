@@ -160,9 +160,12 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       process$(renderData)
 
       const { comp } = singleMap[options.parent ? options.parent._uid : -1] || {}
+      const firstCreation = !_single || !comp // 非单例，或者单例第一次创建
 
       component = createComponent(renderData, renderFn, options, _single)
-      ctx.emit(ctx.Event.InstanceCreated, component)
+      if (firstCreation) {
+        ctx.emit(ctx.Event.InstanceCreated, component)
+      }
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance)
@@ -172,7 +175,7 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
 
       if (isInVueInstance) {
         ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
-      } else if (!_single || !comp) { // 非单例，或者单例第一次创建
+      } else if (firstCreation) {
         ctx.on(ctx.Event.InstanceDestroy, component.remove)
       }
 

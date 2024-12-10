@@ -299,8 +299,12 @@ function apiCreator(Component) {
       var _ref2 = singleMap[options.parent ? options.parent._uid : -1] || {},
           comp = _ref2.comp;
 
+      var firstCreation = !_single || !comp; // 非单例，或者单例第一次创建
+
       component = createComponent(renderData, renderFn, options, _single);
-      ctx.emit(ctx.Event.InstanceCreated, component);
+      if (firstCreation) {
+        ctx.emit(ctx.Event.InstanceCreated, component);
+      }
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance);
@@ -310,8 +314,7 @@ function apiCreator(Component) {
 
       if (isInVueInstance) {
         ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
-      } else if (!_single || !comp) {
-        // 非单例，或者单例第一次创建
+      } else if (firstCreation) {
         ctx.on(ctx.Event.InstanceDestroy, component.remove);
       }
 
