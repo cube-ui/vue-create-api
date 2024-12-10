@@ -33,6 +33,7 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       }
       originRemove && originRemove.apply(this, arguments)
       instance.destroy()
+      ctx.off(ctx.Event.InstanceDestroy, component.remove)
     }
 
     const originShow = component.show
@@ -161,6 +162,7 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       const { comp } = singleMap[options.parent ? options.parent._uid : -1] || {}
 
       component = createComponent(renderData, renderFn, options, _single)
+      ctx.emit(ctx.Event.InstanceCreated, component)
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance)
@@ -171,7 +173,7 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       if (isInVueInstance) {
         ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
       } else if (!_single || !comp) { // 非单例，或者单例第一次创建
-        ctx.once(ctx.Event.InstanceDestroy, beforeDestroy)
+        ctx.on(ctx.Event.InstanceDestroy, component.remove)
       }
 
       return component

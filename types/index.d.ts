@@ -39,6 +39,7 @@ export interface PluginObject {
 }
 
 export interface Event {
+  InstanceCreated: 'instance:created'
   InstanceDestroy: 'instance:destroy'
 }
 

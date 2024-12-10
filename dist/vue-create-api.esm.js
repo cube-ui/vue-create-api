@@ -171,6 +171,7 @@ function apiCreator(Component) {
       }
       originRemove && originRemove.apply(this, arguments);
       instance.destroy();
+      ctx.off(ctx.Event.InstanceDestroy, component.remove);
     };
 
     var originShow = component.show;
@@ -299,6 +300,7 @@ function apiCreator(Component) {
           comp = _ref2.comp;
 
       component = createComponent(renderData, renderFn, options, _single);
+      ctx.emit(ctx.Event.InstanceCreated, component);
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance);
@@ -310,7 +312,7 @@ function apiCreator(Component) {
         ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
       } else if (!_single || !comp) {
         // 非单例，或者单例第一次创建
-        ctx.once(ctx.Event.InstanceDestroy, beforeDestroy);
+        ctx.on(ctx.Event.InstanceDestroy, component.remove);
       }
 
       return component;
@@ -322,6 +324,7 @@ function apiCreator(Component) {
 
 var EventBus = {
   Event: {
+    InstanceCreated: 'instance:created',
     InstanceDestroy: 'instance:destroy'
   },
   events: {},

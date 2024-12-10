@@ -1,5 +1,6 @@
 export default {
   Event: {
+    InstanceCreated: 'instance:created',
     InstanceDestroy: 'instance:destroy'
   },
   events: {},
