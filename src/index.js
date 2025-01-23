@@ -44,13 +44,19 @@ function batchDestroy(filter) {
   if (!Array.isArray(instances)) {
     return
   }
-  instances.forEach(ins => {
-    if (ins && typeof ins.remove === 'function') {
-      ins.remove()
-      hasFilter && cache.remove(ins)
-    }
-  })
-  if (!hasFilter) {
+  if (hasFilter) {
+    instances.forEach(ins => {
+      if (ins && typeof ins.remove === 'function') {
+        ins.remove()
+        cache.remove(ins)
+      }
+    }) 
+  } else {
+    instances.forEach(ins => {
+      if (ins && typeof ins.remove === 'function') {
+        ins.remove()
+      }
+    })
     cache.instances.length = 0
   }
 }
