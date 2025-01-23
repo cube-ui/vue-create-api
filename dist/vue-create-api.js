@@ -320,11 +320,18 @@
   var cache = {
     instances: [],
     add: function add(component) {
-      var alreadyIn = this.instances.find(function (ins) {
-        return ins === component;
-      });
+      var alreadyIn = false;
+      var instances = cache.instances;
+      var len = instances.length;
+      for (var i = 0; i < len; i += 1) {
+        var ins = instances[i];
+        if (ins === component) {
+          alreadyIn = true;
+          break;
+        }
+      }
       if (!alreadyIn) {
-        this.instances.push(component);
+        instances.push(component);
       }
     }
   };
