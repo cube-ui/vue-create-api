@@ -292,3 +292,9 @@ router.afterEach(() => {
   CreateAPI.batchDestroy()
 })
 ```
+
+`batchDestroy`可以接收一个过滤函数，决定哪些实例需要销毁：
+
+```js
+CreateAPI.batchDestroy(instances => instances.filter(ins => ins))
+```

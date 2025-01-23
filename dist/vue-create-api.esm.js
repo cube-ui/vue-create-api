@@ -327,16 +327,40 @@ var cache = {
     if (!alreadyIn) {
       instances.push(component);
     }
+  },
+  remove: function remove(component) {
+    var idx = -1;
+    var instances = cache.instances;
+    var len = instances.length;
+    for (var i = 0; i < len; i += 1) {
+      var ins = instances[i];
+      if (ins === component) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx > -1) {
+      instances.splice(idx, 1);
+    }
   }
 };
 
-function batchDestroy() {
-  cache.instances.forEach(function (ins) {
+function batchDestroy(filter) {
+  var hasFilter = typeof filter === 'function';
+  var instancesCopy = cache.instances.slice();
+  var instances = hasFilter ? filter(instancesCopy) : instancesCopy;
+  if (!Array.isArray(instances)) {
+    return;
+  }
+  instances.forEach(function (ins) {
     if (ins && typeof ins.remove === 'function') {
       ins.remove();
+      hasFilter && cache.remove(ins);
     }
   });
-  cache.instances.length = 0;
+  if (!hasFilter) {
+    cache.instances.length = 0;
+  }
 }
 
 function install(Vue) {

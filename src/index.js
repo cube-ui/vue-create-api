@@ -19,16 +19,40 @@ const cache = {
     if (!alreadyIn) {
       instances.push(component)
     }
+  },
+  remove(component) {
+    let idx = -1
+    const instances = cache.instances
+    const len = instances.length
+    for (let i = 0; i < len; i += 1) {
+      const ins = instances[i]
+      if (ins === component) {
+        idx = i
+        break 
+      }
+    }
+    if (idx > -1) {
+      instances.splice(idx, 1)
+    }
   }
 }
 
-function batchDestroy() {
-  cache.instances.forEach(ins => {
+function batchDestroy(filter) {
+  const hasFilter = typeof filter === 'function'
+  const instancesCopy = cache.instances.slice()
+  const instances = hasFilter ? filter(instancesCopy) : instancesCopy
+  if (!Array.isArray(instances)) {
+    return
+  }
+  instances.forEach(ins => {
     if (ins && typeof ins.remove === 'function') {
       ins.remove()
+      hasFilter && cache.remove(ins)
     }
   })
-  cache.instances.length = 0
+  if (!hasFilter) {
+    cache.instances.length = 0
+  }
 }
 
 function install(Vue, options = {}) {

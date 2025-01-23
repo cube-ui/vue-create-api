@@ -296,3 +296,9 @@ router.afterEach(() => {
   CreateAPI.batchDestroy()
 })
 ```
+
+`batchDestroy` can receive a filter function to determine which instances need to be destroyed:
+
+```js
+CreateAPI.batchDestroy(instances => instances.filter(ins => ins))
+```
