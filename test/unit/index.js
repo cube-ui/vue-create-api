@@ -191,4 +191,44 @@ describe('create api 单元测试', function () {
       })
     })
   })
+
+  describe('#Batch destroy', function() {
+    before(() => {
+      Vue.createAPI(Dialog, ['click'], false)
+    })
+
+    // 测试batchDestroy 销毁非this调用组件
+    it('expect to clear all instances in batch destory', function(done) {
+      const cls = 'dialog-batch-destroy'
+      const dialog1 = Dialog.$create({
+        title: 'Hello',
+        content: 'I am from pure JS1',
+        $class: cls
+      })
+      const dialog2 = Dialog.$create({
+        title: 'Hello',
+        content: 'I am from pure JS2',
+        $class: cls
+      })
+
+      dialog1.show()
+      dialog2.show()
+
+      Vue.nextTick(() => {
+        const dialogs = document.querySelectorAll(`.${cls}`)
+        const length = Array.prototype.slice.apply(dialogs).length
+        expect(length).to.equal(2)
+
+        CreateAPI.batchDestroy()
+
+        {
+          const dialogs = document.querySelectorAll(cls)
+          const length = Array.prototype.slice.apply(dialogs).length
+          expect(length).to.equal(0)
+
+          done()
+        }
+      })
+    })
+  })
 })

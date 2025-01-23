@@ -2,25 +2,33 @@ import { camelize, escapeReg, isBoolean } from './util'
 import { assert, warn } from './debug'
 import apiCreator from './creator'
 import instantiateComponent from './instantiate'
-import EventBus from './events'
 
-const ctx = {
-  plugins: [],
-  ...EventBus
+const cache = {
+  instances: [],
+  add(component) {
+    let alreadyIn = false
+    const instances = cache.instances
+    const len = instances.length
+    for (let i = 0; i < len; i += 1) {
+      const ins = instances[i]
+      if (ins === component) {
+        alreadyIn = true
+        break 
+      }
+    }
+    if (!alreadyIn) {
+      instances.push(component)
+    }
+  }
 }
 
-function use(plugin, ...args) {
-  if (ctx.plugins.find(p => p === plugin)) {
-    return ctx
-  }
-  args.unshift(ctx)
-  if (typeof plugin.install === 'function') {
-    plugin.install.apply(plugin, args)
-  } else if (typeof plugin === 'function') {
-    plugin.apply(null, args)
-  }
-  ctx.plugins.push(plugin)
-  return ctx
+function batchDestroy() {
+  cache.instances.forEach(ins => {
+    if (ins && typeof ins.remove === 'function') {
+      ins.remove()
+    }
+  })
+  cache.instances.length = 0
 }
 
 function install(Vue, options = {}) {
@@ -31,7 +39,7 @@ function install(Vue, options = {}) {
       single = events
       events = []
     }
-    const api = apiCreator.call(this, Component, events, single, ctx)
+    const api = apiCreator.call(this, Component, events, single, cache)
     const createName = processComponentName(Component, {
       componentPrefix,
       apiPrefix,
@@ -52,8 +60,8 @@ function processComponentName(Component, options) {
 }
 
 export default {
-  use,
   install,
+  batchDestroy,
   instantiateComponent,
   version: '__VERSION__'
 }

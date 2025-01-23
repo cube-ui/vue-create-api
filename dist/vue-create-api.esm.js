@@ -1,6 +1,6 @@
 /**
  * vue-create-api v0.2.3
- * (c) 2024 ustbhuangyi
+ * (c) 2025 ustbhuangyi
  * @license MIT
  */
 var _extends = Object.assign || function (target) {
@@ -15,16 +15,6 @@ var _extends = Object.assign || function (target) {
   }
 
   return target;
-};
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
 };
 
 var camelizeRE = /-(\w)/g;
@@ -137,7 +127,7 @@ var eventBeforeDestroy = 'hook:beforeDestroy';
 function apiCreator(Component) {
   var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var single = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  var ctx = arguments[3];
+  var cache = arguments[3];
 
   var Vue = this;
   var singleMap = {};
@@ -171,7 +161,6 @@ function apiCreator(Component) {
       }
       originRemove && originRemove.apply(this, arguments);
       instance.destroy();
-      ctx.off(ctx.Event.InstanceDestroy, component.remove);
     };
 
     var originShow = component.show;
@@ -302,9 +291,6 @@ function apiCreator(Component) {
       var firstCreation = !_single || !comp; // 非单例，或者单例第一次创建
 
       component = createComponent(renderData, renderFn, options, _single);
-      if (firstCreation) {
-        ctx.emit(ctx.Event.InstanceCreated, component);
-      }
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance);
@@ -315,7 +301,7 @@ function apiCreator(Component) {
       if (isInVueInstance) {
         ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
       } else if (firstCreation) {
-        ctx.on(ctx.Event.InstanceDestroy, component.remove);
+        cache.add(component);
       }
 
       return component;
@@ -325,83 +311,25 @@ function apiCreator(Component) {
   return api;
 }
 
-var EventBus = {
-  Event: {
-    InstanceCreated: 'instance:created',
-    InstanceDestroy: 'instance:destroy'
-  },
-  events: {},
-  on: function on(name, handler) {
-    var list = this.events[name];
-    if (!list) {
-      this.events[name] = [handler];
-    } else if (!list.find(function (f) {
-      return f === handler;
-    })) {
-      list.push(handler);
-    }
-  },
-  once: function once(name, handler) {
-    var _this = this;
-
-    var wrapper = function wrapper() {
-      handler.apply(undefined, arguments);
-      _this.off(name, wrapper);
-    };
-    this.on(name, wrapper);
-  },
-  emit: function emit(name) {
-    var list = this.events[name];
-    if (!list) {
-      return;
-    }
-    // 从后往前遍历，避免遍历的时候删除元素，导致不正确的结果产生
-
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    for (var i = list.length - 1; i >= 0; i--) {
-      var handler = list[i];
-      handler.apply(undefined, toConsumableArray(args));
-    }
-  },
-  off: function off(name, handler) {
-    if (!handler) {
-      delete this.events[name];
-    } else {
-      var list = this.events[name];
-      var index = list && list.findIndex(function (fn) {
-        return fn === handler;
-      });
-      index > -1 && list.splice(index, 1);
+var cache = {
+  instances: [],
+  add: function add(component) {
+    var alreadyIn = this.instances.find(function (ins) {
+      return ins === component;
+    });
+    if (!alreadyIn) {
+      this.instances.push(component);
     }
   }
 };
 
-var ctx = _extends({
-  plugins: []
-}, EventBus);
-
-function use(plugin) {
-  if (ctx.plugins.find(function (p) {
-    return p === plugin;
-  })) {
-    return ctx;
-  }
-
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  args.unshift(ctx);
-  if (typeof plugin.install === 'function') {
-    plugin.install.apply(plugin, args);
-  } else if (typeof plugin === 'function') {
-    plugin.apply(null, args);
-  }
-  ctx.plugins.push(plugin);
-  return ctx;
+function batchDestroy() {
+  cache.instances.forEach(function (ins) {
+    if (ins && typeof ins.remove === 'function') {
+      ins.remove();
+    }
+  });
+  cache.instances.length = 0;
 }
 
 function install(Vue) {
@@ -417,7 +345,7 @@ function install(Vue) {
       single = events;
       events = [];
     }
-    var api = apiCreator.call(this, Component, events, single, ctx);
+    var api = apiCreator.call(this, Component, events, single, cache);
     var createName = processComponentName(Component, {
       componentPrefix: componentPrefix,
       apiPrefix: apiPrefix
@@ -440,8 +368,8 @@ function processComponentName(Component, options) {
 }
 
 var index = {
-  use: use,
   install: install,
+  batchDestroy: batchDestroy,
   instantiateComponent: instantiateComponent,
   version: '0.2.3'
 };

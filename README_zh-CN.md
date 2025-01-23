@@ -276,8 +276,10 @@ Hello.$create(config, renderFn)
 
 注意：当我们在普通 JS 文件中使用时，无法让 Prop 响应式更新。
 
-### 自定义插件
-我们可以通过`vue-create-api`提供的`use`方法注册全局插件，例如我们可以在路由切换的时候，统一销毁由非Vue上下文调用（this.$createXxx）产生的实例：
+### 批量销毁
+
+我们可以通过`vue-create-api`提供的`batchDestroy`方法统一销毁由非Vue上下文调用（this.$createXxx）产生的实例，例如我们可以在路由切换的时候进行统一销毁：
+
 ```js
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -286,10 +288,7 @@ import CreateAPI from 'vue-create-api'
 Vue.use(VueRouter)
 
 const router = new VueRouter({ routes: [] })
-
-CreateAPI.use((ctx) => {
-  router.afterEach(() => {
-    ctx.emit(ctx.Event.InstanceDestroy)
-  })
+router.afterEach(() => {
+  CreateAPI.batchDestroy()
 })
 ```

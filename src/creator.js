@@ -4,7 +4,7 @@ import { isFunction, isUndef, isStr } from './util'
 
 const eventBeforeDestroy = 'hook:beforeDestroy'
 
-export default function apiCreator(Component, events = [], single = false, ctx) {
+export default function apiCreator(Component, events = [], single = false, cache) {
   let Vue = this
   let singleMap = {}
   const beforeHooks = []
@@ -33,7 +33,6 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       }
       originRemove && originRemove.apply(this, arguments)
       instance.destroy()
-      ctx.off(ctx.Event.InstanceDestroy, component.remove)
     }
 
     const originShow = component.show
@@ -163,9 +162,6 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       const firstCreation = !_single || !comp // 非单例，或者单例第一次创建
 
       component = createComponent(renderData, renderFn, options, _single)
-      if (firstCreation) {
-        ctx.emit(ctx.Event.InstanceCreated, component)
-      }
 
       function beforeDestroy() {
         cancelWatchProps(ownerInstance)
@@ -176,7 +172,7 @@ export default function apiCreator(Component, events = [], single = false, ctx) 
       if (isInVueInstance) {
         ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
       } else if (firstCreation) {
-        ctx.on(ctx.Event.InstanceDestroy, component.remove)
+        cache.add(component)
       }
 
       return component
