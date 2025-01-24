@@ -46,7 +46,7 @@ function batchDestroy(filter) {
         ins.remove()
         cache.remove(ins)
       }
-    }) 
+    })
   } else {
     instances.forEach(ins => {
       if (ins && isFunction(ins.remove)) {
