@@ -51,6 +51,10 @@
     return typeof fn === 'function';
   }
 
+  function isArray(arr) {
+    return Object.prototype.toString.call(arr) === '[object Array]';
+  }
+
   function assert(condition, msg) {
     if (!condition) {
       throw new Error("[vue-create-api error]: " + msg);
@@ -335,39 +339,35 @@
       }
     },
     remove: function remove(component) {
-      var idx = -1;
       var instances = cache.instances;
       var len = instances.length;
       for (var i = 0; i < len; i += 1) {
         var ins = instances[i];
         if (ins === component) {
-          idx = i;
-          break;
+          instances.splice(i, 1);
+          return;
         }
-      }
-      if (idx > -1) {
-        instances.splice(idx, 1);
       }
     }
   };
 
   function batchDestroy(filter) {
-    var hasFilter = typeof filter === 'function';
+    var hasFilter = isFunction(filter);
     var instancesCopy = cache.instances.slice();
     var instances = hasFilter ? filter(instancesCopy) : instancesCopy;
-    if (!Array.isArray(instances)) {
+    if (!isArray(instances)) {
       return;
     }
     if (hasFilter) {
       instances.forEach(function (ins) {
-        if (ins && typeof ins.remove === 'function') {
+        if (ins && isFunction(ins.remove)) {
           ins.remove();
           cache.remove(ins);
         }
       });
     } else {
       instances.forEach(function (ins) {
-        if (ins && typeof ins.remove === 'function') {
+        if (ins && isFunction(ins.remove)) {
           ins.remove();
         }
       });

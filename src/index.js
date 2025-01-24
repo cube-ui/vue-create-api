@@ -1,4 +1,4 @@
-import { camelize, escapeReg, isBoolean } from './util'
+import { camelize, escapeReg, isBoolean, isFunction, isArray } from './util'
 import { assert, warn } from './debug'
 import apiCreator from './creator'
 import instantiateComponent from './instantiate'
@@ -21,39 +21,35 @@ const cache = {
     }
   },
   remove(component) {
-    let idx = -1
     const instances = cache.instances
     const len = instances.length
     for (let i = 0; i < len; i += 1) {
       const ins = instances[i]
       if (ins === component) {
-        idx = i
-        break 
+        instances.splice(i, 1)
+        return
       }
-    }
-    if (idx > -1) {
-      instances.splice(idx, 1)
     }
   }
 }
 
 function batchDestroy(filter) {
-  const hasFilter = typeof filter === 'function'
+  const hasFilter = isFunction(filter)
   const instancesCopy = cache.instances.slice()
   const instances = hasFilter ? filter(instancesCopy) : instancesCopy
-  if (!Array.isArray(instances)) {
+  if (!isArray(instances)) {
     return
   }
   if (hasFilter) {
     instances.forEach(ins => {
-      if (ins && typeof ins.remove === 'function') {
+      if (ins && isFunction(ins.remove)) {
         ins.remove()
         cache.remove(ins)
       }
     }) 
   } else {
     instances.forEach(ins => {
-      if (ins && typeof ins.remove === 'function') {
+      if (ins && isFunction(ins.remove)) {
         ins.remove()
       }
     })
