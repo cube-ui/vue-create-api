@@ -1,10 +1,11 @@
 import instantiateComponent from './instantiate'
 import parseRenderData from './parse'
 import { isFunction, isUndef, isStr } from './util'
+import * as cache from './cache'
 
 const eventBeforeDestroy = 'hook:beforeDestroy'
 
-export default function apiCreator(Component, events = [], single = false, cache) {
+export default function apiCreator(Component, events = [], single = false) {
   let Vue = this
   let singleMap = {}
   const beforeHooks = []

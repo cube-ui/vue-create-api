@@ -132,12 +132,61 @@
     return parsedEvents;
   }
 
+  var instances = [];
+
+  function add(component) {
+    var alreadyIn = false;
+    for (var i = 0; i < instances.length; i += 1) {
+      var ins = instances[i];
+      if (ins === component) {
+        alreadyIn = true;
+        break;
+      }
+    }
+    if (!alreadyIn) {
+      instances.push(component);
+    }
+  }
+
+  function remove(component) {
+    for (var i = 0; i < instances.length; i += 1) {
+      var ins = instances[i];
+      if (ins === component) {
+        instances.splice(i, 1);
+        return;
+      }
+    }
+  }
+
+  function batchDestroy(filter) {
+    var hasFilter = isFunction(filter);
+    var instancesCopy = instances.slice();
+    var _instances = hasFilter ? filter(instancesCopy) : instancesCopy;
+    if (!isArray(_instances)) {
+      return;
+    }
+    if (hasFilter) {
+      _instances.forEach(function (ins) {
+        if (ins && isFunction(ins.remove)) {
+          ins.remove();
+          remove(ins);
+        }
+      });
+    } else {
+      _instances.forEach(function (ins) {
+        if (ins && isFunction(ins.remove)) {
+          ins.remove();
+        }
+      });
+      instances.length = 0;
+    }
+  }
+
   var eventBeforeDestroy = 'hook:beforeDestroy';
 
   function apiCreator(Component) {
     var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
     var single = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var cache = arguments[3];
 
     var Vue = this;
     var singleMap = {};
@@ -311,7 +360,7 @@
         if (isInVueInstance) {
           ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
         } else if (firstCreation) {
-          cache.add(component);
+          add(component);
         }
 
         return component;
@@ -319,60 +368,6 @@
     };
 
     return api;
-  }
-
-  var cache = {
-    instances: [],
-    add: function add(component) {
-      var alreadyIn = false;
-      var instances = cache.instances;
-      var len = instances.length;
-      for (var i = 0; i < len; i += 1) {
-        var ins = instances[i];
-        if (ins === component) {
-          alreadyIn = true;
-          break;
-        }
-      }
-      if (!alreadyIn) {
-        instances.push(component);
-      }
-    },
-    remove: function remove(component) {
-      var instances = cache.instances;
-      var len = instances.length;
-      for (var i = 0; i < len; i += 1) {
-        var ins = instances[i];
-        if (ins === component) {
-          instances.splice(i, 1);
-          return;
-        }
-      }
-    }
-  };
-
-  function batchDestroy(filter) {
-    var hasFilter = isFunction(filter);
-    var instancesCopy = cache.instances.slice();
-    var instances = hasFilter ? filter(instancesCopy) : instancesCopy;
-    if (!isArray(instances)) {
-      return;
-    }
-    if (hasFilter) {
-      instances.forEach(function (ins) {
-        if (ins && isFunction(ins.remove)) {
-          ins.remove();
-          cache.remove(ins);
-        }
-      });
-    } else {
-      instances.forEach(function (ins) {
-        if (ins && isFunction(ins.remove)) {
-          ins.remove();
-        }
-      });
-      cache.instances.length = 0;
-    }
   }
 
   function install(Vue) {
@@ -388,7 +383,7 @@
         single = events;
         events = [];
       }
-      var api = apiCreator.call(this, Component, events, single, cache);
+      var api = apiCreator.call(this, Component, events, single);
       var createName = processComponentName(Component, {
         componentPrefix: componentPrefix,
         apiPrefix: apiPrefix
