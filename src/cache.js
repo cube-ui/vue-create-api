@@ -3,9 +3,11 @@ import { isFunction, isArray } from './util'
 const instances = []
 
 export function add(component) {
+  let ins
   let alreadyIn = false
-  for (let i = 0; i < instances.length; i += 1) {
-    const ins = instances[i]
+  const len = instances.length
+  for (let i = 0; i < len; i += 1) {
+    ins = instances[i]
     if (ins === component) {
       alreadyIn = true
       break 
@@ -17,11 +19,12 @@ export function add(component) {
 }
 
 export function remove(component) {
-  for (let i = 0; i < instances.length; i += 1) {
-    const ins = instances[i]
+  let ins
+  const len = instances.length
+  for (let i = 0; i < len; i += 1) {
+    ins = instances[i]
     if (ins === component) {
       instances.splice(i, 1)
-      return
     }
   }
 }
@@ -33,19 +36,9 @@ export function batchDestroy(filter) {
   if (!isArray(_instances)) {
     return
   }
-  if (hasFilter) {
-    _instances.forEach(ins => {
-      if (ins && isFunction(ins.remove)) {
-        ins.remove()
-        remove(ins)
-      }
-    })
-  } else {
-    _instances.forEach(ins => {
-      if (ins && isFunction(ins.remove)) {
-        ins.remove()
-      }
-    })
-    instances.length = 0
-  }
+  _instances.forEach(ins => {
+    if (ins && isFunction(ins.remove)) {
+      ins.remove()
+    }
+  })
 }

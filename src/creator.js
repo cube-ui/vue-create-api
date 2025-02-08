@@ -10,7 +10,7 @@ export default function apiCreator(Component, events = [], single = false) {
   let singleMap = {}
   const beforeHooks = []
 
-  function createComponent(renderData, renderFn, options, single) {
+  function createComponent(renderData, renderFn, options, single, ownerInstance) {
     beforeHooks.forEach((before) => {
       before(renderData, renderFn, single)
     })
@@ -24,8 +24,12 @@ export default function apiCreator(Component, events = [], single = false) {
     const component = instantiateComponent(Vue, Component, renderData, renderFn, options)
     const instance = component.$parent
     const originRemove = component.remove
+    const isInVueInstance = !!ownerInstance.$on
 
     component.remove = function () {
+      if (isInVueInstance) {
+        cancelWatchProps(ownerInstance)
+      }
       if (single) {
         if (!singleMap[ownerInsUid]) {
           return
@@ -34,6 +38,7 @@ export default function apiCreator(Component, events = [], single = false) {
       }
       originRemove && originRemove.apply(this, arguments)
       instance.destroy()
+      cache.remove(component)
     }
 
     const originShow = component.show
@@ -159,22 +164,13 @@ export default function apiCreator(Component, events = [], single = false) {
       processEvents(renderData, ownerInstance)
       process$(renderData)
 
-      const { comp } = singleMap[options.parent ? options.parent._uid : -1] || {}
-      const firstCreation = !_single || !comp // 非单例，或者单例第一次创建
-
-      component = createComponent(renderData, renderFn, options, _single)
-
-      function beforeDestroy() {
-        cancelWatchProps(ownerInstance)
-        component.remove()
-        component = null
-      }
+      component = createComponent(renderData, renderFn, options, _single, ownerInstance)
 
       if (isInVueInstance) {
-        ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
-      } else if (firstCreation) {
-        cache.add(component)
+        ownerInstance.$on(eventBeforeDestroy, component.remove.bind(component))
       }
+
+      cache.add(component)
 
       return component
     }
