@@ -278,7 +278,7 @@ Hello.$create(config, renderFn)
 
 ### 批量销毁
 
-我们可以通过`vue-create-api`提供的`batchDestroy`方法统一销毁由非Vue上下文调用（this.$createXxx）产生的实例，例如我们可以在路由切换的时候进行统一销毁：
+我们可以通过`vue-create-api`提供的`batchDestroy`方法统一销毁所有实例，例如我们可以在路由切换的时候进行统一销毁：
 
 ```js
 import Vue from 'vue'
