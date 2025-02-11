@@ -130,18 +130,14 @@ var instances = [];
 
 function add(component) {
   var ins = void 0;
-  var alreadyIn = false;
   var len = instances.length;
   for (var i = 0; i < len; i += 1) {
     ins = instances[i];
     if (ins === component) {
-      alreadyIn = true;
-      break;
+      return;
     }
   }
-  if (!alreadyIn) {
-    instances.push(component);
-  }
+  instances.push(component);
 }
 
 function remove(component) {

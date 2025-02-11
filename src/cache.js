@@ -4,18 +4,14 @@ const instances = []
 
 export function add(component) {
   let ins
-  let alreadyIn = false
   const len = instances.length
   for (let i = 0; i < len; i += 1) {
     ins = instances[i]
     if (ins === component) {
-      alreadyIn = true
-      break 
+      return
     }
   }
-  if (!alreadyIn) {
-    instances.push(component)
-  }
+  instances.push(component)
 }
 
 export function remove(component) {
