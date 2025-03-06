@@ -2,6 +2,7 @@ import { camelize, escapeReg, isBoolean } from './util'
 import { assert, warn } from './debug'
 import apiCreator from './creator'
 import instantiateComponent from './instantiate'
+import { batchDestroy } from './cache'
 
 function install(Vue, options = {}) {
   const {componentPrefix = '', apiPrefix = '$create-'} = options
@@ -33,6 +34,7 @@ function processComponentName(Component, options) {
 
 export default {
   install,
+  batchDestroy,
   instantiateComponent,
   version: '__VERSION__'
 }

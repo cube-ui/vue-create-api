@@ -31,6 +31,7 @@ export interface instantiateComponent {
 }
 
 export interface CreateAPI {
+  batchDestroy: (filter?: (instances: Component[]) => Component[]) => void
   install: PluginFunction<ApiOption>
   instantiateComponent: instantiateComponent
   version: string

@@ -275,3 +275,26 @@ Hello.$create(config, renderFn)
 ```
 
 注意：当我们在普通 JS 文件中使用时，无法让 Prop 响应式更新。
+
+### 批量销毁
+
+我们可以通过`vue-create-api`提供的`batchDestroy`方法统一销毁所有实例，例如我们可以在路由切换的时候进行统一销毁：
+
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import CreateAPI from 'vue-create-api'
+
+Vue.use(VueRouter)
+
+const router = new VueRouter({ routes: [] })
+router.afterEach(() => {
+  CreateAPI.batchDestroy()
+})
+```
+
+`batchDestroy`可以接收一个过滤函数，决定哪些实例需要销毁：
+
+```js
+CreateAPI.batchDestroy(instances => instances.filter(ins => ins))
+```

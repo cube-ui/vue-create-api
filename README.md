@@ -279,3 +279,26 @@ Hello.$create(config, renderFn)
 ```
 
 Notice, when we use in general JS files, we can't make props be reactive.
+
+### batchDestroy
+
+We can use the `batchDestroy` method provided by `vue-create-api` to destroy all instances uniformly. For example, we can destroy them uniformly when the route is switched:
+
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import CreateAPI from 'vue-create-api'
+
+Vue.use(VueRouter)
+
+const router = new VueRouter({ routes: [] })
+router.afterEach(() => {
+  CreateAPI.batchDestroy()
+})
+```
+
+`batchDestroy` can receive a filter function to determine which instances need to be destroyed:
+
+```js
+CreateAPI.batchDestroy(instances => instances.filter(ins => ins))
+```

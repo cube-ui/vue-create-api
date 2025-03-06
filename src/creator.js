@@ -1,6 +1,7 @@
 import instantiateComponent from './instantiate'
 import parseRenderData from './parse'
 import { isFunction, isUndef, isStr } from './util'
+import * as cache from './cache'
 
 const eventBeforeDestroy = 'hook:beforeDestroy'
 
@@ -9,7 +10,7 @@ export default function apiCreator(Component, events = [], single = false) {
   let singleMap = {}
   const beforeHooks = []
 
-  function createComponent(renderData, renderFn, options, single) {
+  function createComponent(renderData, renderFn, options, single, ownerInstance) {
     beforeHooks.forEach((before) => {
       before(renderData, renderFn, single)
     })
@@ -23,8 +24,12 @@ export default function apiCreator(Component, events = [], single = false) {
     const component = instantiateComponent(Vue, Component, renderData, renderFn, options)
     const instance = component.$parent
     const originRemove = component.remove
+    const isInVueInstance = !!ownerInstance.$on
 
     component.remove = function () {
+      if (isInVueInstance) {
+        cancelWatchProps(ownerInstance)
+      }
       if (single) {
         if (!singleMap[ownerInsUid]) {
           return
@@ -33,6 +38,7 @@ export default function apiCreator(Component, events = [], single = false) {
       }
       originRemove && originRemove.apply(this, arguments)
       instance.destroy()
+      cache.remove(component)
     }
 
     const originShow = component.show
@@ -158,17 +164,13 @@ export default function apiCreator(Component, events = [], single = false) {
       processEvents(renderData, ownerInstance)
       process$(renderData)
 
-      component = createComponent(renderData, renderFn, options, _single)
+      component = createComponent(renderData, renderFn, options, _single, ownerInstance)
 
       if (isInVueInstance) {
-        ownerInstance.$on(eventBeforeDestroy, beforeDestroy)
+        ownerInstance.$on(eventBeforeDestroy, component.remove.bind(component))
       }
 
-      function beforeDestroy() {
-        cancelWatchProps(ownerInstance)
-        component.remove()
-        component = null
-      }
+      cache.add(component)
 
       return component
     }

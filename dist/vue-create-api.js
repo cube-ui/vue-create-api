@@ -1,6 +1,6 @@
 /**
  * vue-create-api v0.2.3
- * (c) 2019 ustbhuangyi
+ * (c) 2025 ustbhuangyi
  * @license MIT
  */
 (function (global, factory) {
@@ -49,6 +49,10 @@
 
   function isFunction(fn) {
     return typeof fn === 'function';
+  }
+
+  function isArray(arr) {
+    return Object.prototype.toString.call(arr) === '[object Array]';
   }
 
   function assert(condition, msg) {
@@ -128,6 +132,45 @@
     return parsedEvents;
   }
 
+  var instances = [];
+
+  function add(component) {
+    var ins = void 0;
+    var len = instances.length;
+    for (var i = 0; i < len; i += 1) {
+      ins = instances[i];
+      if (ins === component) {
+        return;
+      }
+    }
+    instances.push(component);
+  }
+
+  function remove(component) {
+    var ins = void 0;
+    var len = instances.length;
+    for (var i = 0; i < len; i += 1) {
+      ins = instances[i];
+      if (ins === component) {
+        instances.splice(i, 1);
+      }
+    }
+  }
+
+  function batchDestroy(filter) {
+    var hasFilter = isFunction(filter);
+    var instancesCopy = instances.slice();
+    var _instances = hasFilter ? filter(instancesCopy) : instancesCopy;
+    if (!isArray(_instances)) {
+      return;
+    }
+    _instances.forEach(function (ins) {
+      if (ins && isFunction(ins.remove)) {
+        ins.remove();
+      }
+    });
+  }
+
   var eventBeforeDestroy = 'hook:beforeDestroy';
 
   function apiCreator(Component) {
@@ -138,7 +181,7 @@
     var singleMap = {};
     var beforeHooks = [];
 
-    function createComponent(renderData, renderFn, options, single) {
+    function createComponent(renderData, renderFn, options, single, ownerInstance) {
       beforeHooks.forEach(function (before) {
         before(renderData, renderFn, single);
       });
@@ -156,8 +199,12 @@
       var component = instantiateComponent(Vue, Component, renderData, renderFn, options);
       var instance = component.$parent;
       var originRemove = component.remove;
+      var isInVueInstance = !!ownerInstance.$on;
 
       component.remove = function () {
+        if (isInVueInstance) {
+          cancelWatchProps(ownerInstance);
+        }
         if (single) {
           if (!singleMap[ownerInsUid]) {
             return;
@@ -166,6 +213,7 @@
         }
         originRemove && originRemove.apply(this, arguments);
         instance.destroy();
+        remove(component);
       };
 
       var originShow = component.show;
@@ -290,17 +338,13 @@
         processEvents(renderData, ownerInstance);
         process$(renderData);
 
-        component = createComponent(renderData, renderFn, options, _single);
+        component = createComponent(renderData, renderFn, options, _single, ownerInstance);
 
         if (isInVueInstance) {
-          ownerInstance.$on(eventBeforeDestroy, beforeDestroy);
+          ownerInstance.$on(eventBeforeDestroy, component.remove.bind(component));
         }
 
-        function beforeDestroy() {
-          cancelWatchProps(ownerInstance);
-          component.remove();
-          component = null;
-        }
+        add(component);
 
         return component;
       }
@@ -346,6 +390,7 @@
 
   var index = {
     install: install,
+    batchDestroy: batchDestroy,
     instantiateComponent: instantiateComponent,
     version: '0.2.3'
   };
